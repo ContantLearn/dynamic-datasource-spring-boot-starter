@@ -17,12 +17,14 @@ package com.baomidou.dynamic.datasource;
 
 import com.baomidou.dynamic.datasource.ds.AbstractRoutingDataSource;
 import com.baomidou.dynamic.datasource.ds.GroupDataSource;
+import com.baomidou.dynamic.datasource.ds.ItemDataSource;
 import com.baomidou.dynamic.datasource.exception.CannotFindDataSourceException;
 import com.baomidou.dynamic.datasource.provider.DynamicDataSourceProvider;
 import com.baomidou.dynamic.datasource.strategy.DynamicDataSourceStrategy;
 import com.baomidou.dynamic.datasource.strategy.LoadBalanceDynamicDataSourceStrategy;
-import com.baomidou.dynamic.datasource.toolkit.DatabasebUtils;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
+import com.p6spy.engine.spy.P6DataSource;
+import io.seata.rm.datasource.DataSourceProxy;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -31,6 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,7 +211,22 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource implemen
     }
 
     private void closeDataSource(DataSource dataSource) throws Exception {
-        DatabasebUtils.closeDataSource(dataSource);
+        if (dataSource instanceof ItemDataSource) {
+            ((ItemDataSource) dataSource).close();
+        } else {
+            if (seata && dataSource instanceof DataSourceProxy) {
+                DataSourceProxy dataSourceProxy = (DataSourceProxy) dataSource;
+                dataSource = dataSourceProxy.getTargetDataSource();
+            }
+            if (p6spy && dataSource instanceof P6DataSource) {
+                Field realDataSourceField = P6DataSource.class.getDeclaredField("realDataSource");
+                realDataSourceField.setAccessible(true);
+                dataSource = (DataSource) realDataSourceField.get(dataSource);
+            }
+            Class<? extends DataSource> clazz = dataSource.getClass();
+            Method closeMethod = clazz.getDeclaredMethod("close");
+            closeMethod.invoke(dataSource);
+        }
     }
 
     @Override
