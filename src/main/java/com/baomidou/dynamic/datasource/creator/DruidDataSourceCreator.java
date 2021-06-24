@@ -23,6 +23,7 @@ import com.alibaba.druid.wall.WallConfig;
 import com.alibaba.druid.wall.WallFilter;
 import com.baomidou.dynamic.datasource.exception.ErrorCreateDataSourceException;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.druid.DruidConfig;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.druid.DruidSlf4jConfig;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.druid.DruidWallConfigUtil;
@@ -46,7 +47,7 @@ import static com.baomidou.dynamic.datasource.support.DdConstants.DRUID_DATASOUR
  * @since 2020/1/21
  */
 @Data
-public class DruidDataSourceCreator implements DataSourceCreator {
+public class DruidDataSourceCreator extends AbstractDataSourceCreator implements DataSourceCreator {
 
     private static Boolean druidExists = false;
 
@@ -63,12 +64,18 @@ public class DruidDataSourceCreator implements DataSourceCreator {
     @Autowired(required = false)
     private ApplicationContext applicationContext;
 
-    public DruidDataSourceCreator(DruidConfig gConfig) {
-        this.gConfig = gConfig;
+    public DruidDataSourceCreator(DynamicDataSourceProperties properties) {
+        super(properties);
+        this.gConfig = properties.getDruid();
     }
 
+//    @Override
+//    public DataSource doCreateDataSource(DataSourceProperty dataSourceProperty) {
+//        return null;
+//    }
+
     @Override
-    public DataSource createDataSource(DataSourceProperty dataSourceProperty) {
+    public DataSource doCreateDataSource(DataSourceProperty dataSourceProperty) {
         DruidDataSource dataSource = new DruidDataSource();
         dataSource.setUsername(dataSourceProperty.getUsername());
         dataSource.setPassword(dataSourceProperty.getPassword());

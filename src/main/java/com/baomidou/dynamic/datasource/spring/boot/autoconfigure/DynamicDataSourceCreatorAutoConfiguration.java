@@ -84,7 +84,7 @@ public class DynamicDataSourceCreatorAutoConfiguration {
         @Order(DRUID_ORDER)
         @ConditionalOnMissingBean
         public DruidDataSourceCreator druidDataSourceCreator() {
-            return new DruidDataSourceCreator(properties.getDruid());
+            return new DruidDataSourceCreator(properties);
         }
 
     }
@@ -99,7 +99,7 @@ public class DynamicDataSourceCreatorAutoConfiguration {
         @Order(HIKARI_ORDER)
         @ConditionalOnMissingBean
         public HikariDataSourceCreator hikariDataSourceCreator() {
-            return new HikariDataSourceCreator(properties.getHikari());
+            return new HikariDataSourceCreator(properties);
         }
     }
 
