@@ -20,7 +20,6 @@ import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSour
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.hikari.HikariCpConfig;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import lombok.Data;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
@@ -35,14 +34,12 @@ import static com.baomidou.dynamic.datasource.support.DdConstants.HIKARI_DATASOU
  * @author TaoYu
  * @since 2020/1/21
  */
-@Data
 public class HikariDataSourceCreator extends AbstractDataSourceCreator implements DataSourceCreator {
 
     private static Boolean hikariExists = false;
     private static Method configCopyMethod = null;
 
     static {
-
         try {
             Class.forName(HIKARI_DATASOURCE);
             hikariExists = true;
@@ -51,7 +48,7 @@ public class HikariDataSourceCreator extends AbstractDataSourceCreator implement
         }
     }
 
-    private HikariCpConfig gConfig;
+    private final HikariCpConfig gConfig;
 
     public HikariDataSourceCreator(DynamicDataSourceProperties properties) {
         super(properties);

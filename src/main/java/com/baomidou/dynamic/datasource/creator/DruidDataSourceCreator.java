@@ -59,20 +59,15 @@ public class DruidDataSourceCreator extends AbstractDataSourceCreator implements
         }
     }
 
-    private DruidConfig gConfig;
+    private final DruidConfig gConfig;
 
     @Autowired(required = false)
     private ApplicationContext applicationContext;
 
-    public DruidDataSourceCreator(DynamicDataSourceProperties properties) {
-        super(properties);
-        this.gConfig = properties.getDruid();
+    public DruidDataSourceCreator(DynamicDataSourceProperties dynamicDataSourceProperties) {
+        super(dynamicDataSourceProperties);
+        this.gConfig = dynamicDataSourceProperties.getDruid();
     }
-
-//    @Override
-//    public DataSource doCreateDataSource(DataSourceProperty dataSourceProperty) {
-//        return null;
-//    }
 
     @Override
     public DataSource doCreateDataSource(DataSourceProperty dataSourceProperty) {

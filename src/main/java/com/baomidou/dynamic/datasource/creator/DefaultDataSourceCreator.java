@@ -16,7 +16,6 @@
 package com.baomidou.dynamic.datasource.creator;
 
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
-import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +32,6 @@ import java.util.List;
 @Setter
 public class DefaultDataSourceCreator {
 
-    private DynamicDataSourceProperties properties;
     private List<DataSourceCreator> creators;
 
     public DataSource createDataSource(DataSourceProperty dataSourceProperty) {
@@ -47,57 +45,7 @@ public class DefaultDataSourceCreator {
         if (dataSourceCreator == null) {
             throw new IllegalStateException("creator must not be null,please check the DataSourceCreator");
         }
-
-//        String publicKey = dataSourceProperty.getPublicKey();
-//        if (StringUtils.isEmpty(publicKey)) {
-//            dataSourceProperty.setPublicKey(properties.getPublicKey());
-//        }
-//
-//        Boolean lazy = dataSourceProperty.getLazy();
-//        if (lazy == null) {
-//            dataSourceProperty.setLazy(properties.getLazy());
-//        }
-
-        DataSource dataSource = dataSourceCreator.createDataSource(dataSourceProperty);
-//        this.runScrip(dataSource, dataSourceProperty);
-//        return wrapDataSource(dataSource, dataSourceProperty);
-        return dataSource;
+        return dataSourceCreator.createDataSource(dataSourceProperty);
     }
 
-//    private void runScrip(DataSource dataSource, DataSourceProperty dataSourceProperty) {
-//        String schema = dataSourceProperty.getSchema();
-//        String data = dataSourceProperty.getData();
-//        if (StringUtils.hasText(schema) || StringUtils.hasText(data)) {
-//            ScriptRunner scriptRunner = new ScriptRunner(dataSourceProperty.isContinueOnError(), dataSourceProperty.getSeparator());
-//            if (StringUtils.hasText(schema)) {
-//                scriptRunner.runScript(dataSource, schema);
-//            }
-//            if (StringUtils.hasText(data)) {
-//                scriptRunner.runScript(dataSource, data);
-//            }
-//        }
-//    }
-//
-//    private DataSource wrapDataSource(DataSource dataSource, DataSourceProperty dataSourceProperty) {
-//        String name = dataSourceProperty.getPoolName();
-//        DataSource targetDataSource = dataSource;
-//
-//        Boolean enabledP6spy = properties.getP6spy() && dataSourceProperty.getP6spy();
-//        if (enabledP6spy) {
-//            targetDataSource = new P6DataSource(dataSource);
-//            log.debug("dynamic-datasource [{}] wrap p6spy plugin", name);
-//        }
-//
-//        Boolean enabledSeata = properties.getSeata() && dataSourceProperty.getSeata();
-//        SeataMode seataMode = properties.getSeataMode();
-//        if (enabledSeata) {
-//            if (SeataMode.XA == seataMode) {
-//                targetDataSource = new DataSourceProxyXA(dataSource);
-//            } else {
-//                targetDataSource = new DataSourceProxy(dataSource);
-//            }
-//            log.debug("dynamic-datasource [{}] wrap seata plugin transaction mode [{}]", name, seataMode);
-//        }
-//        return new ItemDataSource(name, dataSource, targetDataSource, enabledP6spy, enabledSeata, seataMode);
-//    }
 }

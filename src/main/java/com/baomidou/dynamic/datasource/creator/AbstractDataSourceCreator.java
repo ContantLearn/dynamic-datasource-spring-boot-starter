@@ -23,30 +23,32 @@ import com.baomidou.dynamic.datasource.support.ScriptRunner;
 import com.p6spy.engine.spy.P6DataSource;
 import io.seata.rm.datasource.DataSourceProxy;
 import io.seata.rm.datasource.xa.DataSourceProxyXA;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 
 @Slf4j
-@RequiredArgsConstructor
 public abstract class AbstractDataSourceCreator {
 
-    private final DynamicDataSourceProperties properties;
+    protected final DynamicDataSourceProperties dynamicDataSourceProperties;
+
+    protected AbstractDataSourceCreator(DynamicDataSourceProperties dynamicDataSourceProperties) {
+        this.dynamicDataSourceProperties = dynamicDataSourceProperties;
+    }
 
     public abstract DataSource doCreateDataSource(DataSourceProperty dataSourceProperty);
 
     public DataSource createDataSource(DataSourceProperty dataSourceProperty) {
         String publicKey = dataSourceProperty.getPublicKey();
         if (StringUtils.isEmpty(publicKey)) {
-            publicKey = properties.getPublicKey();
+            publicKey = dynamicDataSourceProperties.getPublicKey();
             dataSourceProperty.setPublicKey(publicKey);
         }
 
         Boolean lazy = dataSourceProperty.getLazy();
         if (lazy == null) {
-            lazy = properties.getLazy();
+            lazy = dynamicDataSourceProperties.getLazy();
             dataSourceProperty.setLazy(lazy);
         }
         DataSource dataSource = doCreateDataSource(dataSourceProperty);
@@ -72,14 +74,14 @@ public abstract class AbstractDataSourceCreator {
         String name = dataSourceProperty.getPoolName();
         DataSource targetDataSource = dataSource;
 
-        Boolean enabledP6spy = properties.getP6spy() && dataSourceProperty.getP6spy();
+        Boolean enabledP6spy = dynamicDataSourceProperties.getP6spy() && dataSourceProperty.getP6spy();
         if (enabledP6spy) {
             targetDataSource = new P6DataSource(dataSource);
             log.debug("dynamic-datasource [{}] wrap p6spy plugin", name);
         }
 
-        Boolean enabledSeata = properties.getSeata() && dataSourceProperty.getSeata();
-        SeataMode seataMode = properties.getSeataMode();
+        Boolean enabledSeata = dynamicDataSourceProperties.getSeata() && dataSourceProperty.getSeata();
+        SeataMode seataMode = dynamicDataSourceProperties.getSeataMode();
         if (enabledSeata) {
             if (SeataMode.XA == seataMode) {
                 targetDataSource = new DataSourceProxyXA(dataSource);
